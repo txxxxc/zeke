@@ -11,19 +11,14 @@ export const add = https.onRequest(async (req: Request, res: Response) => {
     return
   }
   const parseResult = RequestSchema.safeParse(req.body)
-  if ('error' in parseResult) {
+  if (!parseResult.success) {
     res.status(400).json('Invalid Parameters')
     return
   }
-  if ('data' in parseResult) {
-    const members = parseResult.data
-    const usecase = new MembersAddUseCase()
-    await usecase.do({ members: members })
-    res.status(200).json('Members are sucessfully added')
-    return
-  }
-
-  // fallback
-  res.status(500).send('Something went wrong')
+  const members = parseResult.data
+  const usecase = new MembersAddUseCase()
+  await usecase.do({ members: members })
+  res.status(200).json('Members are sucessfully added')
+  return
 })
 

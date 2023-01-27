@@ -26,20 +26,15 @@ export const resolved = https.onRequest(async (req: Request, res: Response) => {
     return
   }
   const parseResult = requestSchema.safeParse(req.body)
-  if ('error' in parseResult) {
+  if (!parseResult.success) { 
     res.status(400).json('Invalid Parameters')
     return
   }
-  if ('data' in parseResult) {
-    const usecase = new DiscussionResolvedUseCase()
-    await usecase.do({
-      channelId,
-      githubPayload: parseResult.data,
-    })
-    res.status(200).json('Members are sucessfully added')
-    return
-  }
-
-  // fallback
-  res.status(500).send('Something went wrong')
+  const usecase = new DiscussionResolvedUseCase()
+  await usecase.do({
+    channelId,
+    githubPayload: parseResult.data,
+  })
+  res.status(200).json('Members are sucessfully added')
 })
+

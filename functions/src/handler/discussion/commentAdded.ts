@@ -49,39 +49,33 @@ export const commentAdded = https.onRequest(async (req: Request, res: Response) 
     return
   }
   const parseResult = requestSchema.safeParse(req.body)
-  if ('error' in parseResult) {
+  if (!parseResult.success) {
     res.status(400).json('Invalid Parameters')
     return
   }
-  if ('data' in parseResult) {
-    const usecase = new DiscussionCommentAddedUseCase()
-    const { comment, sender } = parseResult.data
-    const {
-      body,
-      id,
-      html_url: htmlUrl,
-      user,
-      title,
-    } = parseResult.data.discussion
-    await usecase.do({
-      githubPayload: {
-        comment,
-        sender,
-        discussion: {
-          body,
-          id,
-          html_url: htmlUrl,
-          title,
-          owner: {
-            id: user.id,
-          },
+  const usecase = new DiscussionCommentAddedUseCase()
+  const { comment, sender } = parseResult.data
+  const {
+    body,
+    id,
+    html_url: htmlUrl,
+    user,
+    title,
+  } = parseResult.data.discussion
+  await usecase.do({
+    githubPayload: {
+      comment,
+      sender,
+      discussion: {
+        body,
+        id,
+        html_url: htmlUrl,
+        title,
+        owner: {
+          id: user.id,
         },
       },
-    })
-    res.status(200).json('Member are sucessfully added')
-    return
-  }
-
-  // fallback
-  res.status(500).send('Something went wrong')
+    },
+  })
+  res.status(200).json('Member are sucessfully added')
 })
