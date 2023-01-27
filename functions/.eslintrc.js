@@ -14,11 +14,11 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: ['tsconfig.json', 'tsconfig.dev.json'],
-    tsconfigRootDir: __dirname,
-    sourceType: 'module',
-  },
+  // parserOptions: {
+  //   project: ['tsconfig.json'],
+  //   tsconfigRootDir: __dirname,
+  //   sourceType: 'module',
+  // },
   ignorePatterns: [
     '/lib/**/*', // Ignore built files.
   ],
@@ -26,5 +26,6 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     'import/no-unresolved': 0,
+    'require-jsdoc': 0,
   },
 }
