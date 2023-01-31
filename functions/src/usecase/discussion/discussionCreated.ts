@@ -10,7 +10,7 @@ export type DiscussionCreatedInputs = {
 
 type GitHubPayload = {
   discussion: Pick<Discussion, 'id' | 'title' | 'html_url' | 'body'>
-  sender: Pick<User, 'id'>
+  sender: Pick<User, 'login'>
 }
 
 export class DiscussionCreatedUseCase
@@ -23,10 +23,11 @@ export class DiscussionCreatedUseCase
     } = inputs
     const adminMembers = await getAdminMembers()
     const adminMembersSlackIdList = adminMembers.map((member) => member.slackId)
+    // TODO: senderのloginからslackの表示名取得したい
     const { ts, channel } = await postMessage({
       channel: channelId,
       attachments: builder.message.create({
-        questionOwner: sender.id.toString(),
+        questionOwner: sender.login,
         mentionedSlackIds: adminMembersSlackIdList,
         discussionTitle: discussion.title,
         discussionBody: discussion.body,

@@ -4,9 +4,9 @@ import { z } from 'zod'
 import { Discussion, DiscussionCommentEvent } from '@octokit/webhooks-types'
 import { DiscussionCommentAddedUseCase } from '@/usecase'
 
-const sender = schemaForType<Pick<DiscussionCommentEvent['sender'], 'id'>>()(
+const sender = schemaForType<Pick<DiscussionCommentEvent['sender'], 'login'>>()(
   z.object({
-    id: z.number(),
+    login: z.string(),
   })
 )
 const comment = schemaForType<
@@ -23,7 +23,7 @@ const discussion = schemaForType<
     DiscussionCommentEvent['discussion'],
     'id' | 'title' | 'html_url' | 'body'
   > & {
-    user: Pick<Discussion['user'], 'id'>
+    user: Pick<Discussion['user'], 'login'>
   }
 >()(
   z.object({
@@ -32,7 +32,7 @@ const discussion = schemaForType<
     html_url: z.string(),
     body: z.string(),
     user: z.object({
-      id: z.number(),
+      login: z.string(),
     }),
   })
 )
@@ -72,7 +72,7 @@ export const commentAdded = https.onRequest(async (req: Request, res: Response) 
         html_url: htmlUrl,
         title,
         owner: {
-          id: user.id,
+          id: user.login,
         },
       },
     },

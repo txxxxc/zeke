@@ -12,10 +12,10 @@ export interface DiscussionCommentAddedInputs {
 
 type GitHubPayload = {
   discussion: Pick<Discussion, 'id' | 'title' | 'html_url' | 'body'> & {
-    owner: Pick<Discussion['user'], 'id'>
+    owner: Pick<Discussion['user'], 'login'>
   }
   comment: Pick<DiscussionCommentCreatedEvent['comment'], 'body' | 'html_url'>
-  sender: Pick<DiscussionCommentCreatedEvent['sender'], 'id'>
+  sender: Pick<DiscussionCommentCreatedEvent['sender'], 'login'>
 }
 
 export class DiscussionCommentAddedUseCase
@@ -29,34 +29,35 @@ export class DiscussionCommentAddedUseCase
       discussionId: discussion.id.toString(),
     })
     // NOTE: 質問者がコメントを追加した場合はメンションなしのコメントを追加する
-    if (discussion.owner.id === sender.id) {
+    if (discussion.owner.login === sender.login) {
       await postThread({
         channel: channelId,
         attachments: builder.message.amend({
           discussionBody: comment.body,
           discussionTitle: discussion.title,
           discussionUrl: comment.html_url,
-          questionOwnerName: discussion.owner.id.toString(),
+          questionOwnerName: discussion.owner.login,
         }),
         thread_ts: ts,
       })
       return
     }
 
-    if (discussion.owner.id !== sender.id) {
+    if (discussion.owner.login !== sender.login) {
       const { slackId } = await getMemberByGitHubId(
-        discussion.owner.id.toString()
+        discussion.owner.login
       )
       await postThread({
         channel: channelId,
         attachments: builder.message.reply({
-          commentOwner: sender.id.toString(),
+          commentOwner: sender.login,
           commentUrl: comment.html_url,
           commentBody: comment.body,
           discussionTitle: discussion.title,
           discussionUrl: discussion.html_url,
           mentionTarget: slackId,
         }),
+        thread_ts: ts,
       })
     }
   }

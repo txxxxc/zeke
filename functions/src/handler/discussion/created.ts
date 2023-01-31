@@ -6,7 +6,7 @@ import { DiscussionCreatedUseCase } from '@/usecase'
 import { env } from '@/constants'
 
 const requestSchema = z.object({
-  sender: schemaForType<Pick<User, 'id'>>()(z.object({ id: z.number() })),
+  sender: schemaForType<Pick<User, 'login'>>()(z.object({ login: z.string() })),
   discussion: schemaForType<
     Pick<Discussion, 'id' | 'title' | 'html_url' | 'body'>
   >()(
@@ -27,6 +27,7 @@ export const created = https.onRequest(async (req: Request, res: Response) => {
   const parseResult = requestSchema.safeParse(req.body)
   if (!parseResult.success) {
     res.status(400).json('Invalid Parameters')
+    return
   }
   const channelId = env().SLACK_CHANNEL_ID
   const usecase = new DiscussionCreatedUseCase()

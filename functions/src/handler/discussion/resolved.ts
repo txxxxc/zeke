@@ -6,7 +6,7 @@ import { DiscussionResolvedUseCase } from '@/usecase'
 import { schemaForType } from '@/helper/schemaForType'
 
 const requestSchema = z.object({
-  sender: schemaForType<Pick<User, 'id'>>()(z.object({ id: z.number() })),
+  sender: schemaForType<Pick<User, 'login'>>()(z.object({ login: z.string() })),
   discussion: schemaForType<
     Pick<Discussion, 'id' | 'title' | 'html_url' | 'body'>
   >()(

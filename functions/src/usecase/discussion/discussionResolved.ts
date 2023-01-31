@@ -10,7 +10,7 @@ export type DiscussionResolvedUseCaseInputs = {
 
 type GitHubPayload = {
   discussion: Pick<Discussion, 'id' | 'title' | 'html_url' | 'body'>
-  sender: Pick<User, 'id'>
+  sender: Pick<User, 'login'>
 }
 
 // NOTE: interface作ってもいいけどE2E出来るしmock化する意味ない気がするので一旦作りません！
@@ -29,7 +29,7 @@ export class DiscussionResolvedUseCase
         channel: channelId,
         ts,
         attachments: resolve(
-          sender.id.toString(),
+          sender.login,
           discussion.title,
           discussion.html_url,
           discussion.body
