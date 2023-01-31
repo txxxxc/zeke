@@ -72,7 +72,7 @@ export const commentAdded = https.onRequest(async (req: Request, res: Response) 
         html_url: htmlUrl,
         title,
         owner: {
-          id: user.login,
+          login: user.login,
         },
       },
     },
