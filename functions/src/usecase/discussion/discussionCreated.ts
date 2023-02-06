@@ -1,4 +1,4 @@
-import { getAdminMembers, savePost } from '@/lib/firestore'
+import { getAdminMembers, getMemberByGitHubId, savePost } from '@/lib/firestore'
 import { builder, postMessage } from '@/lib/slack'
 import { IUseCase } from '@/usecase'
 import { Discussion, User } from '@octokit/webhooks-types'
@@ -21,13 +21,14 @@ export class DiscussionCreatedUseCase
       channelId,
       githubPayload: { discussion, sender },
     } = inputs
+    const member = await getMemberByGitHubId(sender.login)
     const adminMembers = await getAdminMembers()
     const adminMembersSlackIdList = adminMembers.map((member) => member.slackId)
     // TODO: senderのloginからslackの表示名取得したい
     const { ts, channel } = await postMessage({
       channel: channelId,
       attachments: builder.message.create({
-        questionOwner: sender.login,
+        questionOwner: member.slackId,
         mentionedSlackIds: adminMembersSlackIdList,
         discussionTitle: discussion.title,
         discussionBody: discussion.body,
