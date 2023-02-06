@@ -30,13 +30,14 @@ export class DiscussionCommentAddedUseCase
     })
     // NOTE: 質問者がコメントを追加した場合はメンションなしのコメントを追加する
     if (discussion.owner.login === sender.login) {
+      const member = await getMemberByGitHubId(discussion.owner.login)
       await postThread({
         channel: channelId,
         attachments: builder.message.amend({
           discussionBody: comment.body,
           discussionTitle: discussion.title,
           discussionUrl: comment.html_url,
-          questionOwnerName: discussion.owner.login,
+          questionOwnerName: member.slackId,
         }),
         thread_ts: ts,
       })
@@ -44,13 +45,11 @@ export class DiscussionCommentAddedUseCase
     }
 
     if (discussion.owner.login !== sender.login) {
-      const { slackId } = await getMemberByGitHubId(
-        discussion.owner.login
-      )
+      const { slackId } = await getMemberByGitHubId(discussion.owner.login)
       await postThread({
         channel: channelId,
         attachments: builder.message.reply({
-          commentOwner: sender.login,
+          commentOwner: slackId,
           commentUrl: comment.html_url,
           commentBody: comment.body,
           discussionTitle: discussion.title,
